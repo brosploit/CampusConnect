@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup Rules (Android 11 and lower)
+  Excludes all sensitive encrypted databases and token storage from cloud backup.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="cc_secure_tokens.xml" />
+    <exclude domain="database" path="campus_connect.db" />
+    <exclude domain="database" path="campus_connect.db-wal" />
+    <exclude domain="database" path="campus_connect.db-shm" />
+    <exclude domain="root" path="databases" />
+</full-backup-content>

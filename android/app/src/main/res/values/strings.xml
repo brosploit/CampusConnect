@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Campus Connect</string>
+    <string name="channel_monitoring_name">Connectivity Diagnostic Monitoring</string>
+    <string name="channel_monitoring_desc">Visible notification while diagnostic monitoring session is active.</string>
+    <string name="monitoring_active_title">Diagnostic Monitoring Active</string>
+    <string name="monitoring_active_desc">Recording zone connectivity conditions. Tap to review or stop.</string>
+    <string name="action_stop">Stop Monitoring</string>
+</resources>

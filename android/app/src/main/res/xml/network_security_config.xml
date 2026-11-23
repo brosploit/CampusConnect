@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Network Security Configuration
+  Enforces HTTPS, blocks cleartext, and configures dynamic SPKI certificate pinning with backup pins.
+-->
+<network-security-config>
+    <!-- Base Configuration: Cleartext permanently prohibited -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Production API Domain with SPKI Public Key Pinning & Disaster Recovery -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.campusconnect.edu</domain>
+        <!-- Primary Leaf & Backup Intermediate Pin-Set -->
+        <pin-set expiration="2027-01-01">
+            <!-- Primary Leaf Pin -->
+            <pin digest="SHA-256">47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=</pin>
+            <!-- Disaster Recovery Backup Intermediate Pin -->
+            <pin digest="SHA-256">k2ErWTSp4jxQKsKT6ggDxYriyqnIqWq+PO532uNe27i=</pin>
+        </pin-set>
+    </domain-config>
+
+    <!-- Debug Configuration: Permits local emulator testing without disabling prod validation -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

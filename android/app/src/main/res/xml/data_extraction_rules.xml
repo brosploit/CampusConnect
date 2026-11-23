@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Data Extraction Rules (Android 12+)
+  Prohibits cloud backup and physical device transfer of sensitive tokens and diagnostic databases.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="cc_secure_tokens.xml" />
+        <exclude domain="database" path="campus_connect.db" />
+        <exclude domain="root" path="databases" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="cc_secure_tokens.xml" />
+        <exclude domain="database" path="campus_connect.db" />
+        <exclude domain="root" path="databases" />
+    </device-transfer>
+</data-extraction-rules>

@@ -1,0 +1,28 @@
+export declare const env: {
+    NODE_ENV: "development" | "production" | "test";
+    PORT: number;
+    API_PREFIX: string;
+    CORS_ALLOWED_ORIGINS: string;
+    COOKIE_SECRET: string;
+    CSRF_SECRET: string;
+    JWT_ACCESS_SECRET: string;
+    JWT_REFRESH_SECRET: string;
+    JWT_ACCESS_EXPIRATION: string;
+    JWT_REFRESH_EXPIRATION_DAYS: number;
+    PASSWORD_RESET_EXPIRATION_MINUTES: number;
+    DATABASE_URL: string;
+    RATE_LIMIT_AUTH_MAX: number;
+    RATE_LIMIT_AUTH_WINDOW_MS: number;
+    RATE_LIMIT_READINGS_MAX: number;
+    RATE_LIMIT_READINGS_WINDOW_MS: number;
+    RATE_LIMIT_BATCH_MAX: number;
+    RATE_LIMIT_BATCH_WINDOW_MS: number;
+    RATE_LIMIT_GENERAL_MAX: number;
+    RATE_LIMIT_GENERAL_WINDOW_MS: number;
+    MAX_BATCH_SIZE: number;
+    MIN_SAMPLE_THRESHOLD: number;
+    MIN_DISTINCT_DEVICES: number;
+    MAX_MONITORING_DURATION_MINUTES: number;
+    DATABASE_MIGRATION_URL?: string | undefined;
+};
+export declare const corsAllowlist: string[];
