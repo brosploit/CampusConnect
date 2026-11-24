@@ -23,8 +23,8 @@ export const RegisterPage: React.FC = () => {
       setError('Passwords do not match.');
       return;
     }
-    if (password.length < 10) {
-      setError('Password must contain at least 10 characters.');
+    if (password.length < 12) {
+      setError('Password must contain at least 12 characters.');
       return;
     }
 
@@ -97,7 +97,7 @@ export const RegisterPage: React.FC = () => {
 
           <div>
             <label htmlFor="reg-password" className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-              Password (Min 10 characters)
+              Password (Min 12 characters, Aa1!)
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">

@@ -18,6 +18,7 @@ const EnvSchema = z
     PASSWORD_RESET_EXPIRATION_MINUTES: z.coerce.number().default(15),
     DATABASE_URL: z.string().default('postgresql://cc_api_user:postgres@localhost:5432/campus_connect'),
     DATABASE_MIGRATION_URL: z.string().optional(),
+    USE_MEMORY_DB: z.coerce.boolean().default(false),
     RATE_LIMIT_AUTH_MAX: z.coerce.number().default(5),
     RATE_LIMIT_AUTH_WINDOW_MS: z.coerce.number().default(15 * 60 * 1000),
     RATE_LIMIT_READINGS_MAX: z.coerce.number().default(10),
@@ -51,7 +52,8 @@ const EnvSchema = z
           !isInsecureAccessSecret &&
           !isInsecureRefreshSecret &&
           !isInsecureCookieSecret &&
-          !isInsecureCsrfSecret
+          !isInsecureCsrfSecret &&
+          !data.USE_MEMORY_DB
         );
       }
       return true;

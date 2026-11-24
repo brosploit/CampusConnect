@@ -23,6 +23,13 @@
         </pin-set>
     </domain-config>
 
+    <!-- Local Development Loopback / Android Emulator (Cleartext permitted only for local dev loopback) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+
     <!-- Debug Configuration: Permits local emulator testing without disabling prod validation -->
     <debug-overrides>
         <trust-anchors>

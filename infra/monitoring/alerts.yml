@@ -1,0 +1,69 @@
+# Alertmanager Alerting Rules for Campus Connect Security & Infrastructure Health
+groups:
+  - name: security_and_authentication_alerts
+    rules:
+      # 1. Authentication Anomaly: High Login Failure Rate (Brute-Force / Credential Stuffing)
+      - alert: HighAuthenticationFailureRate
+        expr: rate(campusconnect_auth_login_failures_total[5m]) > 2
+        for: 2m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Abnormal surge in failed login attempts on Campus Connect API"
+          description: "Detected {{ $value }} failed logins per second over the last 5 minutes. Possible brute-force attack or credential stuffing."
+
+      # 2. API Abuse: High Rate-Limiting Triggers
+      - alert: RateLimitThresholdExceededSpike
+        expr: rate(campusconnect_rate_limit_exceeded_total[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          category: abuse
+        annotations:
+          summary: "Rate limit threshold exceeded at elevated frequency"
+          description: "Rate limit rejections exceeded threshold ({{ $value }} req/sec). Possible scraping or denial of service attempt."
+
+      # 3. Suspicious Administrative Actions: Privilege Changes & Suspensions
+      - alert: AdministrativeRoleChangeAlert
+        expr: increase(campusconnect_audit_events_total{event_type="USER_ROLE_CHANGED"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: high
+          category: audit
+        annotations:
+          summary: "Administrator role modification executed"
+          description: "A user account role was modified or elevated in the last 5 minutes. Audit log review required."
+
+      # 4. Service Reliability: 5xx Server Error Spike
+      - alert: ApiHigh5xxErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100 > 1
+        for: 3m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "API 5xx error rate exceeded 1%"
+          description: "Current error rate is {{ $value }}% of total API traffic. Investigate unhandled exceptions or database saturation."
+
+      # 5. Database Health: Connection Pool Saturation
+      - alert: DatabaseConnectionPoolHigh
+        expr: pg_stat_activity_count / pg_settings_max_connections * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          category: database
+        annotations:
+          summary: "PostgreSQL active connections approaching saturation (>85%)"
+          description: "Database connection pool utilization is at {{ $value }}%. Potential connection leak or spike in concurrent operations."
+
+      # 6. Data Protection: Backup Failure Alert
+      - alert: BackupExecutionFailure
+        expr: time() - campusconnect_last_successful_backup_timestamp > 90000 # 25 hours
+        for: 15m
+        labels:
+          severity: critical
+          category: data-protection
+        annotations:
+          summary: "Daily encrypted database backup has not succeeded within 25 hours"
+          description: "Last verified successful backup occurred over 25 hours ago. Automated backup pipeline may have failed."

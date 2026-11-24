@@ -12,11 +12,17 @@ Campus Connect documents, analyzes, and visualizes mobile-network connectivity c
 ## Documentation
 - `docs/PROJECT_SPECIFICATION.md` — product requirements and scope
 - `docs/ARCHITECTURE.md` — system architecture
+- `docs/IMPLEMENTATION_STATUS_REPORT.md` — factual implementation status report & audit
+- `docs/PERMANENT_SECURITY_ENGINEERING_RULES.md` — 18 permanent security engineering rules & mandatory reporting standards
+- `docs/THREAT_MODEL.md` — complete threat model and attack vectors
+- `docs/PRIVACY_SECURITY.md` — consent, privacy, security
+- `docs/PRODUCTION_DEPLOYMENT_PLAN.md` — environment separation, secrets & infrastructure hardening
+- `docs/INCIDENT_RESPONSE_PLAN.md` — NIST SP 800-61 Rev. 2 playbooks
+- `docs/DEPLOYMENT_GATE_REVIEW.md` — 10-point production deployment gate review
 - `docs/ANDROID_IMPLEMENTATION.md` — Android app, APIs, permissions, offline behavior
 - `docs/WEB_DASHBOARD.md` — dashboard requirements
 - `docs/DATABASE_SCHEMA.md` — proposed PostgreSQL schema
 - `docs/API_DOCUMENTATION.md` — REST API contract
-- `docs/PRIVACY_SECURITY.md` — consent, privacy, security
 - `docs/ANALYTICS.md` — metrics and interpretation
 - `docs/TESTING.md` — test strategy and acceptance criteria
 - `docs/DEPLOYMENT.md` — deployment guidance

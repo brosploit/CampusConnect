@@ -7,7 +7,7 @@ let repositoryInstance: IRepository;
 
 export function getRepository(): IRepository {
   if (!repositoryInstance) {
-    if (env.NODE_ENV === 'test') {
+    if (env.NODE_ENV === 'test' || env.USE_MEMORY_DB) {
       repositoryInstance = new MemoryRepository();
     } else {
       // In production or development, use PgRepository by default,

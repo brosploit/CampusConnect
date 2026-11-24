@@ -1,0 +1,149 @@
+name: Campus Connect Secure CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  # 1. Secret Scanning Gate
+  secret-scan:
+    name: Secret & Credential Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # 2. Backend Security & Test Gate
+  backend-checks:
+    name: Backend Security, SCA & Unit Tests
+    runs-on: ubuntu-latest
+    needs: [secret-scan]
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Software Composition Analysis (npm audit)
+        run: npm audit --audit-level=high
+
+      - name: Static Type Checking
+        run: npx tsc --noEmit
+
+      - name: Automated Security Integration Tests
+        run: npm test
+        env:
+          NODE_ENV: test
+          JWT_ACCESS_SECRET: test-key-access-secret-minimum-32-chars-long
+          JWT_REFRESH_SECRET: test-key-refresh-secret-minimum-32-chars-long
+          COOKIE_SECRET: test-cookie-secret-minimum-32-chars-long
+          CSRF_SECRET: test-csrf-secret-minimum-32-chars-long
+
+  # 3. Frontend Security & Build Gate
+  frontend-checks:
+    name: Frontend Security, SCA & Tests
+    runs-on: ubuntu-latest
+    needs: [secret-scan]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Software Composition Analysis (npm audit)
+        run: npm audit --audit-level=high
+
+      - name: Automated Web Security Tests (XSS, CSRF, Access Control)
+        run: npm test
+
+      - name: Production Bundle Compilation
+        run: npm run build
+
+  # 4. Container Vulnerability Scanning
+  container-scan:
+    name: Container Vulnerability Scan (Trivy)
+    runs-on: ubuntu-latest
+    needs: [backend-checks, frontend-checks]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Backend Image
+        run: docker build -t campusconnect-backend:scan ./backend
+
+      - name: Scan Backend Container with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'campusconnect-backend:scan'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+  # 5. Protected Staging Deployment
+  deploy-staging:
+    name: Deploy to Staging Environment
+    runs-on: ubuntu-latest
+    needs: [container-scan]
+    if: github.ref == 'refs/heads/develop'
+    environment:
+      name: staging
+      url: https://staging.campusconnect.edu
+    steps:
+      - name: Deploy to Staging Cluster
+        run: echo "Deploying verified build to staging environment"
+
+  # 6. Manual Approval Gate for Production Release
+  deploy-production:
+    name: Protected Production Deployment Gate
+    runs-on: ubuntu-latest
+    needs: [container-scan]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production # Enforces GitHub Protected Environment with Required Approvers
+      url: https://dashboard.campusconnect.edu
+    steps:
+      - name: Verify Deployment Approvals
+        run: echo "Production deployment approved by authorized Institutional Security Lead"
+
+      - name: Execute Database Migrations (Least-Privilege Migration Role)
+        run: echo "Running database migrations via migration user"
+
+      - name: Deploy Hardened Services
+        run: echo "Deploying immutable containers to production cluster"

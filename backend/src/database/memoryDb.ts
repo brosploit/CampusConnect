@@ -13,7 +13,7 @@ import {
   ZoneAggregateRecord,
   AuditLogRecord,
 } from './types';
-import { MonitoringSessionStatus, ValidationStatus, UserRole } from '../config/constants';
+import { MonitoringSessionStatus, ValidationStatus, UserRole, NetworkType, MeasurementSource } from '../config/constants';
 import { env } from '../config/env';
 
 export class MemoryRepository implements IRepository {
@@ -65,6 +65,100 @@ export class MemoryRepository implements IRepository {
       map_geometry: null,
       is_active: true,
       created_at: new Date(),
+    });
+
+    const cafeteriaZoneId = '44444444-4444-4444-4444-444444444444';
+    this.zones.set(cafeteriaZoneId, {
+      id: cafeteriaZoneId,
+      campus_id: campusId,
+      building_id: null,
+      name: 'Student Cafeteria',
+      description: 'Campus Dining & Common Area',
+      map_geometry: null,
+      is_active: true,
+      created_at: new Date(),
+    });
+
+    // Seed default test accounts: Password for both is 'CampusConnect!2026'
+    const defaultPasswordHash = '$argon2id$v=19$m=65536,t=3,p=1$KnvuI62Ce5l2NzM2SenNvQ$SgBSt/7NXuA2GnunDKreR48/2+KOBn3g4rG+MxH4Q+Q';
+
+    const studentId = 'aaaaaaaa-1111-1111-1111-111111111111';
+    this.users.set(studentId, {
+      id: studentId,
+      email: 'student@campus.edu',
+      password_hash: defaultPasswordHash,
+      display_name: 'Alex Student',
+      role: UserRole.STUDENT,
+      is_verified: true,
+      is_suspended: false,
+      mfa_enabled: false,
+      mfa_secret: null,
+      tokens_revoked_at: null,
+      created_at: new Date(),
+      updated_at: new Date(),
+      deleted_at: null,
+    });
+
+    const moderatorId = 'bbbbbbbb-2222-2222-2222-222222222222';
+    this.users.set(moderatorId, {
+      id: moderatorId,
+      email: 'moderator@campus.edu',
+      password_hash: defaultPasswordHash,
+      display_name: 'Morgan Moderator',
+      role: UserRole.MODERATOR,
+      is_verified: true,
+      is_suspended: false,
+      mfa_enabled: false,
+      mfa_secret: null,
+      tokens_revoked_at: null,
+      created_at: new Date(),
+      updated_at: new Date(),
+      deleted_at: null,
+    });
+
+    // Seed sample readings for Student Cafeteria (>= 5 readings across >= 3 devices to satisfy k-anonymity)
+    const deviceIds = [
+      studentId,
+      'cccccccc-3333-3333-3333-333333333333',
+      'dddddddd-4444-4444-4444-444444444444',
+    ];
+
+    const speeds = [38.5, 42.1, 45.0, 39.8, 41.2, 44.6];
+    const latencies = [32, 28, 35, 30, 29, 31];
+
+    speeds.forEach((speed, idx) => {
+      const rId = `55555555-5555-5555-5555-55555555555${idx}`;
+      const devId = deviceIds[idx % deviceIds.length];
+      this.readings.set(rId, {
+        reading_id: rId,
+        user_id: devId,
+        zone_id: cafeteriaZoneId,
+        network_type: NetworkType.MOBILE,
+        download_mbps: speed,
+        latency_ms: latencies[idx],
+        measurement_source: MeasurementSource.MANUAL,
+        client_measured_at: new Date(Date.now() - (idx + 1) * 3600000),
+        received_at: new Date(Date.now() - (idx + 1) * 3600000),
+        app_version: '1.0.0',
+        platform_version: 'Android 14',
+        validation_status: ValidationStatus.ACCEPTED,
+        validation_notes: null,
+      });
+    });
+
+    // Seed 1 sample issue report in the moderator queue
+    const sampleIssueId = '77777777-7777-7777-7777-777777777777';
+    this.issueReports.set(sampleIssueId, {
+      id: sampleIssueId,
+      user_id: studentId,
+      zone_id: libraryZoneId,
+      category: 'VERY_SLOW_DATA',
+      description: 'Frequent timeout and very low download speeds during peak study hours near the 2nd floor stacks.',
+      created_at: new Date(Date.now() - 7200000),
+      status: 'NEW' as any,
+      reviewed_by: null,
+      reviewed_at: null,
+      admin_notes: null,
     });
   }
 
